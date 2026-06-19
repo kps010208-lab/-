@@ -9,7 +9,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
-# --- Модели (Таблицы БД) ---
+
 class Department(db.Model):
     __tablename__ = 'departments'
     id = db.Column(db.Integer, primary_key=True)
@@ -36,15 +36,15 @@ class Employee(db.Model):
     position_id = db.Column(db.Integer, db.ForeignKey('positions.id'), nullable=False)
 
 
-# --- 1. СОЗДАНИЕ ТАБЛИЦ И ЗАПОЛНЕНИЕ ТЕСТОВЫМИ ДАННЫМИ ---
+
 with app.app_context():
     db.create_all()
 
-    # Проверяем, пустая ли БД
+    
     if Department.query.count() == 0:
         print("📌 Заполняем базу данных тестовыми данными...")
 
-        # 1. Отделы
+        
         depts = [
             Department(name='IT-отдел', location='Офис 101'),
             Department(name='Отдел продаж', location='Офис 202'),
@@ -52,7 +52,7 @@ with app.app_context():
         ]
         db.session.add_all(depts)
 
-        # 2. Должности
+       
         pos = [
             Position(title='Разработчик', salary=120000),
             Position(title='Менеджер', salary=80000),
@@ -61,10 +61,9 @@ with app.app_context():
         ]
         db.session.add_all(pos)
 
-        # Сохраняем отделы и должности, чтобы получить их ID
+       
         db.session.commit()
 
-        # 3. Сотрудники (ПРАВИЛЬНО: передаем объекты Employee)
         employees = [
             Employee(
                 full_name='Иван Иванов',
@@ -104,7 +103,6 @@ with app.app_context():
         print(f"   - Сотрудников: {Employee.query.count()}")
 
 
-# --- МАРШРУТЫ (СТРАНИЦЫ) ---
 
 @app.route('/')
 def index():
@@ -117,7 +115,6 @@ def index():
                            total_positions=total_positions)
 
 
-# ---------- ОТДЕЛЫ ----------
 @app.route('/departments')
 def departments():
     depts = Department.query.all()
@@ -149,7 +146,7 @@ def delete_department(id):
     return redirect(url_for('departments'))
 
 
-# ---------- ДОЛЖНОСТИ ----------
+# ДОЛЖНОСТИ 
 @app.route('/positions')
 def positions():
     pos = Position.query.all()
@@ -181,7 +178,7 @@ def delete_position(id):
     return redirect(url_for('positions'))
 
 
-# ---------- СОТРУДНИКИ ----------
+
 @app.route('/employees')
 def employees():
     all_employees = db.session.query(
@@ -232,7 +229,7 @@ def delete_employee(id):
     return redirect(url_for('employees'))
 
 
-# ---------- ПОИСК ----------
+
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     results = []
@@ -251,5 +248,6 @@ def search():
 
 
 if __name__ == '__main__':
-    # Для Windows используем порт 5001 (чтобы избежать конфликта с системным процессом)
-    app.run(debug=True, host='127.0.0.1', port=5001)
+    import os
+    port = int(os.environ.get('PORT', 5001))
+    app.run(debug=True, host='0.0.0.0', port=port)
