@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Кадровый учёт - УП04</title>
     <style>
-        
+        /* ===== ОБЩИЕ СТИЛИ ===== */
         * {
             margin: 0;
             padding: 0;
@@ -24,7 +24,7 @@
             margin: 0 auto;
         }
 
-       
+        /* ===== ШАПКА ===== */
         header {
             background: linear-gradient(135deg, #1a1a2e, #16213e);
             color: #fff;
@@ -55,7 +55,60 @@
             font-weight: bold;
         }
 
-        
+        /* ===== ГЛОБАЛЬНЫЙ ПОИСК ===== */
+        .global-search {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .global-search input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 18px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+
+        .global-search input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .global-search .search-info {
+            font-size: 14px;
+            color: #888;
+            white-space: nowrap;
+        }
+
+        .global-search .search-info strong {
+            color: #1a1a2e;
+        }
+
+        .btn-clear-search {
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .btn-clear-search:hover {
+            background: #c0392b;
+        }
+
+        /* ===== СТАТИСТИКА ===== */
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -84,7 +137,7 @@
             margin-top: 5px;
         }
 
-      
+        /* ===== СЕКЦИИ ===== */
         .section {
             background: #fff;
             border-radius: 12px;
@@ -114,7 +167,7 @@
             margin-left: 8px;
         }
 
-      
+        /* ===== КНОПКИ ===== */
         .btn {
             padding: 8px 18px;
             border: none;
@@ -174,6 +227,12 @@
             font-size: 12px;
         }
 
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
         /* ===== ТАБЛИЦЫ ===== */
         .table-wrapper {
             overflow-x: auto;
@@ -208,6 +267,13 @@
             display: flex;
             gap: 6px;
             flex-wrap: wrap;
+        }
+
+        /* ===== ПОДСВЕТКА ПОИСКА ===== */
+        .highlight {
+            background: #ffeb3b;
+            padding: 0 2px;
+            border-radius: 2px;
         }
 
         /* ===== МОДАЛЬНОЕ ОКНО ===== */
@@ -295,7 +361,14 @@
             margin-top: 10px;
         }
 
-       
+        .modal .warning-msg {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+
+        
         .toast {
             position: fixed;
             bottom: 30px;
@@ -325,7 +398,7 @@
             border-left: 4px solid #e74c3c;
         }
 
-        
+        /* ===== АДАПТИВ ===== */
         @media (max-width: 700px) {
             header {
                 flex-direction: column;
@@ -343,6 +416,12 @@
             }
             .stats {
                 grid-template-columns: repeat(2, 1fr);
+            }
+            .global-search {
+                flex-direction: column;
+            }
+            .global-search .search-info {
+                white-space: normal;
             }
         }
 
@@ -368,13 +447,22 @@
             padding: 30px 15px;
             font-style: italic;
         }
+
+        .search-result-badge {
+            background: #3498db;
+            color: #fff;
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            margin-left: 8px;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
 
-   
+        
         <header>
             <h1>🏢 <span>Кадровый учёт</span></h1>
             <div>
@@ -383,6 +471,14 @@
             </div>
         </header>
 
+        
+        <div class="global-search">
+            <input type="text" id="globalSearchInput" placeholder="🔍 Поиск по всем разделам (ФИО, отдел, должность...)" oninput="globalSearch()">
+            <span class="search-info" id="searchInfo">Найдено: <strong id="searchCount">0</strong> совпадений</span>
+            <button class="btn-clear-search" onclick="clearGlobalSearch()">✕ Сбросить</button>
+        </div>
+
+     
         <div class="stats" id="stats">
             <div class="stat-card"><div class="number" id="statEmployees">0</div><div class="label">Сотрудников</div></div>
             <div class="stat-card"><div class="number" id="statDepartments">0</div><div class="label">Отделов</div></div>
@@ -412,7 +508,7 @@
             </div>
         </div>
 
-        
+    
         <div class="section" id="sectionDepartments">
             <div class="section-header">
                 <h2>🏢 Отделы <span class="count" id="countDepartments">(0)</span></h2>
@@ -433,7 +529,7 @@
             </div>
         </div>
 
-        
+       
         <div class="section" id="sectionPositions">
             <div class="section-header">
                 <h2>💼 Должности <span class="count" id="countPositions">(0)</span></h2>
@@ -470,12 +566,12 @@
         </div>
     </div>
 
-  
+
     <div class="toast" id="toast"></div>
 
-
+   
     <script>
-    
+        
 
         const STORAGE_KEY = 'kadrovyj_uchet_data';
 
@@ -508,7 +604,6 @@
                 const raw = localStorage.getItem(STORAGE_KEY);
                 if (raw) {
                     const data = JSON.parse(raw);
-                    // Если в данных нет _nextId — добавляем
                     if (!data._nextId) {
                         data._nextId = {
                             employee: Math.max(...data.employees.map(e => e.id), 0) + 1,
@@ -532,7 +627,7 @@
 
         let appData = loadData();
 
-      
+       
 
         function getNextId(type) {
             const key = type === 'employee' ? 'employee' : type === 'department' ? 'department' : 'position';
@@ -575,63 +670,140 @@
             return appData.employees.some(e => e.position_id === positionId);
         }
 
+
+        let searchQuery = '';
+
+        function globalSearch() {
+            const input = document.getElementById('globalSearchInput');
+            searchQuery = input.value.trim().toLowerCase();
+            renderAll();
+        }
+
+        function clearGlobalSearch() {
+            document.getElementById('globalSearchInput').value = '';
+            searchQuery = '';
+            renderAll();
+            showToast('🔍 Поиск сброшен');
+        }
+
+        function highlightText(text, query) {
+            if (!query || !text) return text;
+            const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        function matchesSearch(text, query) {
+            if (!query) return true;
+            if (!text) return false;
+            return text.toLowerCase().includes(query);
+        }
+
        
+
+        let totalSearchMatches = 0;
 
         function renderAll() {
             renderEmployees();
             renderDepartments();
             renderPositions();
             updateStats();
+            updateSearchInfo();
         }
 
         function renderEmployees() {
             const tbody = document.getElementById('employeesTableBody');
             const count = document.getElementById('countEmployees');
 
-            if (appData.employees.length === 0) {
+            const query = searchQuery;
+
+            
+            let filtered = appData.employees;
+            if (query) {
+                filtered = appData.employees.filter(emp =>
+                    emp.full_name.toLowerCase().includes(query) ||
+                    getDepartmentName(emp.department_id).toLowerCase().includes(query) ||
+                    getPositionTitle(emp.position_id).toLowerCase().includes(query) ||
+                    (emp.birth_date && emp.birth_date.includes(query))
+                );
+            }
+
+            if (filtered.length === 0 && appData.employees.length > 0 && query) {
+                tbody.innerHTML = `<tr class="empty-row"><td colspan="6">🔍 По запросу «${query}» сотрудников не найдено</td></tr>`;
+                count.textContent = `(0 из ${appData.employees.length})`;
+                return;
+            }
+
+            if (filtered.length === 0) {
                 tbody.innerHTML = `<tr class="empty-row"><td colspan="6">Нет сотрудников. Добавьте первого!</td></tr>`;
                 count.textContent = '(0)';
                 return;
             }
 
-            count.textContent = `(${appData.employees.length})`;
+            count.textContent = query ? `(${filtered.length} из ${appData.employees.length})` : `(${appData.employees.length})`;
 
-            tbody.innerHTML = appData.employees.map(emp => `
-                    <tr>
-                        <td>${emp.id}</td>
-                        <td><strong>${emp.full_name}</strong></td>
-                        <td>${emp.birth_date || '—'}</td>
-                        <td>${getDepartmentName(emp.department_id)}</td>
-                        <td>${getPositionTitle(emp.position_id)}</td>
-                        <td>
-                            <div class="actions">
-                                <button class="btn btn-primary btn-sm" onclick="openModal('employee', ${emp.id})">✏️</button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteRecord('employee', ${emp.id})">🗑️</button>
-                            </div>
-                        </td>
-                    </tr>
-                `).join('');
+            tbody.innerHTML = filtered.map(emp => {
+                const nameHtml = query ? highlightText(emp.full_name, query) : emp.full_name;
+                const deptName = getDepartmentName(emp.department_id);
+                const posTitle = getPositionTitle(emp.position_id);
+                const deptHtml = query ? highlightText(deptName, query) : deptName;
+                const posHtml = query ? highlightText(posTitle, query) : posTitle;
+
+                return `
+                        <tr>
+                            <td>${emp.id}</td>
+                            <td><strong>${nameHtml}</strong></td>
+                            <td>${emp.birth_date || '—'}</td>
+                            <td>${deptHtml}</td>
+                            <td>${posHtml}</td>
+                            <td>
+                                <div class="actions">
+                                    <button class="btn btn-primary btn-sm" onclick="openModal('employee', ${emp.id})">✏️</button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteRecord('employee', ${emp.id})">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+            }).join('');
         }
 
         function renderDepartments() {
             const tbody = document.getElementById('departmentsTableBody');
             const count = document.getElementById('countDepartments');
 
-            if (appData.departments.length === 0) {
+            const query = searchQuery;
+
+            let filtered = appData.departments;
+            if (query) {
+                filtered = appData.departments.filter(dept =>
+                    dept.name.toLowerCase().includes(query) ||
+                    dept.location.toLowerCase().includes(query)
+                );
+            }
+
+            if (filtered.length === 0 && appData.departments.length > 0 && query) {
+                tbody.innerHTML = `<tr class="empty-row"><td colspan="4">🔍 По запросу «${query}» отделов не найдено</td></tr>`;
+                count.textContent = `(0 из ${appData.departments.length})`;
+                return;
+            }
+
+            if (filtered.length === 0) {
                 tbody.innerHTML = `<tr class="empty-row"><td colspan="4">Нет отделов. Добавьте первый!</td></tr>`;
                 count.textContent = '(0)';
                 return;
             }
 
-            count.textContent = `(${appData.departments.length})`;
+            count.textContent = query ? `(${filtered.length} из ${appData.departments.length})` : `(${appData.departments.length})`;
 
-            tbody.innerHTML = appData.departments.map(dept => {
+            tbody.innerHTML = filtered.map(dept => {
                 const used = isEmployeeUsed(dept.id);
+                const nameHtml = query ? highlightText(dept.name, query) : dept.name;
+                const locHtml = query ? highlightText(dept.location, query) : dept.location;
+
                 return `
                         <tr>
                             <td>${dept.id}</td>
-                            <td><strong>${dept.name}</strong></td>
-                            <td>${dept.location}</td>
+                            <td><strong>${nameHtml}</strong></td>
+                            <td>${locHtml}</td>
                             <td>
                                 <div class="actions">
                                     <button class="btn btn-primary btn-sm" onclick="openModal('department', ${dept.id})">✏️</button>
@@ -649,21 +821,43 @@
             const tbody = document.getElementById('positionsTableBody');
             const count = document.getElementById('countPositions');
 
-            if (appData.positions.length === 0) {
+            const query = searchQuery;
+
+            let filtered = appData.positions;
+            if (query) {
+                filtered = appData.positions.filter(pos =>
+                    pos.title.toLowerCase().includes(query) ||
+                    pos.salary.toString().includes(query)
+                );
+            }
+
+            if (filtered.length === 0 && appData.positions.length > 0 && query) {
+                tbody.innerHTML = `<tr class="empty-row"><td colspan="4">🔍 По запросу «${query}» должностей не найдено</td></tr>`;
+                count.textContent = `(0 из ${appData.positions.length})`;
+                return;
+            }
+
+            if (filtered.length === 0) {
                 tbody.innerHTML = `<tr class="empty-row"><td colspan="4">Нет должностей. Добавьте первую!</td></tr>`;
                 count.textContent = '(0)';
                 return;
             }
 
-            count.textContent = `(${appData.positions.length})`;
+            count.textContent = query ? `(${filtered.length} из ${appData.positions.length})` : `(${appData.positions.length})`;
 
-            tbody.innerHTML = appData.positions.map(pos => {
+            tbody.innerHTML = filtered.map(pos => {
                 const used = isPositionUsed(pos.id);
+                const titleHtml = query ? highlightText(pos.title, query) : pos.title;
+                const salaryStr = pos.salary.toLocaleString();
+                const salaryHtml = query && salaryStr.includes(query) ?
+                    highlightText(salaryStr, query) :
+                    salaryStr;
+
                 return `
                         <tr>
                             <td>${pos.id}</td>
-                            <td><strong>${pos.title}</strong></td>
-                            <td>${pos.salary.toLocaleString()}</td>
+                            <td><strong>${titleHtml}</strong></td>
+                            <td>${salaryHtml}</td>
                             <td>
                                 <div class="actions">
                                     <button class="btn btn-primary btn-sm" onclick="openModal('position', ${pos.id})">✏️</button>
@@ -683,7 +877,42 @@
             document.getElementById('statPositions').textContent = appData.positions.length;
         }
 
-        
+        function updateSearchInfo() {
+            const countEl = document.getElementById('searchCount');
+            const input = document.getElementById('globalSearchInput');
+
+            if (!searchQuery) {
+                countEl.textContent = appData.employees.length + appData.departments.length + appData.positions.length;
+                document.getElementById('searchInfo').innerHTML = 'Всего записей: <strong id="searchCount">' +
+                    (appData.employees.length + appData.departments.length + appData.positions.length) +
+                    '</strong>';
+                return;
+            }
+
+            // Считаем совпадения по всем трём разделам
+            const empMatches = appData.employees.filter(e =>
+                e.full_name.toLowerCase().includes(searchQuery) ||
+                getDepartmentName(e.department_id).toLowerCase().includes(searchQuery) ||
+                getPositionTitle(e.position_id).toLowerCase().includes(searchQuery)
+            ).length;
+
+            const deptMatches = appData.departments.filter(d =>
+                d.name.toLowerCase().includes(searchQuery) ||
+                d.location.toLowerCase().includes(searchQuery)
+            ).length;
+
+            const posMatches = appData.positions.filter(p =>
+                p.title.toLowerCase().includes(searchQuery) ||
+                p.salary.toString().includes(searchQuery)
+            ).length;
+
+            const total = empMatches + deptMatches + posMatches;
+
+            document.getElementById('searchInfo').innerHTML =
+                `🔍 Найдено: <strong>${total}</strong> совпадений (👨‍💼 ${empMatches}, 🏢 ${deptMatches}, 💼 ${posMatches})`;
+        }
+
+       
 
         let modalType = 'employee';
         let editId = null;
@@ -704,9 +933,18 @@
             submitBtn.textContent = isEdit ? 'Обновить' : 'Сохранить';
 
             let html = '';
+            let warnings = '';
 
             if (type === 'employee') {
+                if (appData.departments.length === 0) {
+                    warnings += `<p class="warning-msg">⚠️ Сначала создайте отделы!</p>`;
+                }
+                if (appData.positions.length === 0) {
+                    warnings += `<p class="warning-msg">⚠️ Сначала создайте должности!</p>`;
+                }
+
                 html = `
+                        ${warnings}
                         <label>ФИО *</label>
                         <input type="text" id="emp_name" value="${record ? record.full_name : ''}" required placeholder="Иванов Иван Иванович">
 
@@ -743,13 +981,6 @@
                     `;
             }
 
-            if (appData.departments.length === 0 && type === 'employee') {
-                html += `<p style="color:#e74c3c;font-size:13px;margin-top:-10px;">⚠️ Сначала создайте отделы и должности!</p>`;
-            }
-            if (appData.positions.length === 0 && type === 'employee') {
-                html += `<p style="color:#e74c3c;font-size:13px;margin-top:-10px;">⚠️ Сначала создайте должности!</p>`;
-            }
-
             fields.innerHTML = html;
             overlay.classList.add('active');
         }
@@ -770,6 +1001,7 @@
             return null;
         }
 
+     
 
         function saveRecord(e) {
             e.preventDefault();
@@ -859,12 +1091,11 @@
             showToast(isEdit ? '✅ Запись обновлена!' : '✅ Запись добавлена!');
         }
 
-    
+      
 
         function deleteRecord(type, id) {
             const label = getTypeLabel(type);
 
-            
             if (type === 'department' && isEmployeeUsed(id)) {
                 showToast('❌ Нельзя удалить отдел, в котором есть сотрудники!', 'error');
                 return;
@@ -889,7 +1120,7 @@
             showToast(`🗑️ ${label} удалён(а)`);
         }
 
-   
+       
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeModal();
@@ -899,11 +1130,10 @@
             if (e.target === e.currentTarget) closeModal();
         });
 
-    
+      
 
         renderAll();
 
-        
         if (appData.employees.length === 0 && appData.departments.length === 0 && appData.positions.length === 0) {
             setTimeout(() => {
                 showToast('👋 Добро пожаловать! Начните с создания отделов и должностей', 'success');
